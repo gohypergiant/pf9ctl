@@ -18,8 +18,7 @@ var createCmd = &cobra.Command{
 	},
 }
 
-/*
-This initialization of create command to root isnot in use for now.
+// This initialization of create command to root isnot in use for now.
 func init() {
-	//rootCmd.AddCommand(createCmd)
-}*/
+	rootCmd.AddCommand(createCmd)
+}

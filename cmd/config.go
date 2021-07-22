@@ -3,14 +3,12 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"time"
 
-	"github.com/platform9/pf9ctl/pkg/color"
 	"github.com/platform9/pf9ctl/pkg/pmk"
 	"github.com/platform9/pf9ctl/pkg/util"
 	"github.com/spf13/cobra"
@@ -173,104 +171,4 @@ func init() {
 	configCmdSet.Flags().StringVarP(&Password, "password", "p", "", "sets password (use 'single quotes' to pass password)")
 	configCmdSet.Flags().StringVarP(&region, "region", "r", "", "sets region")
 	configCmdSet.Flags().StringVarP(&tenant, "tenant", "t", "", "sets tenant")
-}
-
-// This function will validate the user credentials entered during config set and bail out if invalid
-func validateUserCredentials(pmk.Config, pmk.Client) error {
-
-	auth, err := c.Keystone.GetAuth(
-		ctx.Username,
-		ctx.Password,
-		ctx.Tenant,
-	)
-
-	if err != nil {
-		RegionInvalid = false
-		return err
-	}
-
-	// To validate region.
-	endpointURL, err1 := pmk.FetchRegionFQDN(ctx, auth)
-	if endpointURL == "" || err1 != nil {
-		RegionInvalid = true
-		zap.S().Debug("Invalid Region")
-		return errors.New("Invalid Region")
-	}
-
-	return nil
-}
-
-func configValidation(bool, int) error {
-
-	if pmk.LoopCounter <= MaxLoopNoConfig-1 {
-
-		//Check if we are setting config through pf9ctl config set command.
-		if !SetConfig {
-			// If Oldconfig exists and invalid credentials entered during config prompt
-			if pmk.OldConfigExist {
-				if pmk.InvalidExistingConfig {
-					// If user enters invalid credentials during prompt of config (due to invalid config found after config loading).
-					if RegionInvalid {
-						fmt.Println("\n" + color.Red("x ") + "Invalid Region entered")
-						zap.S().Debug("Invalid Region entered")
-					} else {
-						fmt.Println("\n" + color.Red("x ") + "Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-						zap.S().Debug("Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-					}
-
-				} else if pmk.OldConfigExist && pmk.LoopCounter == 0 {
-					// If invalid credentials are found during config loading
-					if RegionInvalid {
-						fmt.Println("\n" + color.Red("x ") + "Invalid Region found")
-						zap.S().Debug("Invalid Region found")
-					} else {
-						fmt.Println("\n" + color.Red("x ") + "Invalid credentials found (Platform9 Account URL/Username/Password/Region/Tenant)")
-						zap.S().Debug("Invalid credentials found (Platform9 Account URL/Username/Password/Region/Tenant)")
-					}
-				}
-
-			} else {
-				// If user enters invalid credentials during new config promput (due to config not found)
-				if RegionInvalid {
-					fmt.Println("\n" + color.Red("x ") + "Invalid Region entered")
-					zap.S().Debug("Invalid Region entered")
-				} else {
-					fmt.Println("\n" + color.Red("x ") + "Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-					zap.S().Debug("Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-				}
-
-			}
-		} else {
-			// If user enters invalid credentials during config set through "pf9ctl config set"
-			if RegionInvalid {
-				fmt.Println("\n" + color.Red("x ") + "Invalid Region entered")
-				zap.S().Debug("Invalid Region entered")
-			} else {
-				fmt.Println("\n" + color.Red("x ") + "Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-				zap.S().Debug("Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-			}
-
-		}
-	}
-	// If existing initial config is Invalid
-	if (pmk.LoopCounter == 0) && (pmk.OldConfigExist) {
-		pmk.InvalidExistingConfig = true
-		pmk.LoopCounter += 1
-	} else {
-		// If user enteres invalid credentials during new config pormpt.
-		pmk.LoopCounter += 1
-	}
-
-	// If any invalid credentials extered multiple times in new config prompt then to bail out the recursive loop (thrice)
-	if pmk.LoopCounter >= MaxLoopNoConfig && !(pmk.InvalidExistingConfig) {
-		zap.S().Fatalf("Invalid credentials entered multiple times (Platform9 Account URL/Username/Password/Region/Tenant)")
-	} else if pmk.LoopCounter >= MaxLoopNoConfig+1 && pmk.InvalidExistingConfig {
-		if RegionInvalid {
-			fmt.Println(color.Red("x ") + "Invalid Region entered")
-		} else {
-			fmt.Println(color.Red("x ") + "Invalid credentials entered (Platform9 Account URL/Username/Password/Region/Tenant)")
-		}
-		zap.S().Fatalf("Invalid credentials entered multiple times (Platform9 Account URL/Username/Password/Region/Tenant)")
-	}
-	return nil
 }

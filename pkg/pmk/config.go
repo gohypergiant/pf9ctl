@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/platform9/pf9ctl/pkg/color"
+	"github.com/platform9/pf9ctl/pkg/util"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh/terminal"
-	"github.com/platform9/pf9ctl/pkg/util"
 )
 
 var (

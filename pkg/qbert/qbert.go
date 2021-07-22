@@ -49,9 +49,7 @@ type ClusterCreateRequest struct {
 	Masterless            bool       `json:"masterless"`
 }
 
-func (c QbertImpl) CreateCluster(
-	r ClusterCreateRequest,
-	projectID, token string) (string, error) {
+func (c QbertImpl) CreateCluster(r ClusterCreateRequest, projectID, token string) (string, error) {
 
 	exists, _, err := c.CheckClusterExists(r.Name, projectID, token)
 
@@ -129,9 +127,7 @@ func (c QbertImpl) AttachNode(clusterID, projectID, token string, nodeIDs []stri
 		return fmt.Errorf("Unable to marshal payload: %s", err.Error())
 	}
 
-	attachEndpoint := fmt.Sprintf(
-		"%s/qbert/v3/%s/clusters/%s/attach",
-		c.fqdn, projectID, clusterID)
+	attachEndpoint := fmt.Sprintf("%s/qbert/v3/%s/clusters/%s/attach", c.fqdn, projectID, clusterID)
 
 	client := http.Client{}
 

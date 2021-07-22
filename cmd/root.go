@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	//homedir "github.com/mitchellh/go-homedir"
 	"github.com/platform9/pf9ctl/pkg/log"
 	"github.com/platform9/pf9ctl/pkg/util"
 	"github.com/spf13/cobra"
@@ -62,25 +61,10 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().BoolVar(&verbosity, "verbose", false, "print verbose logs")
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pf9ctl.yaml)")
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // InitConfig reads in config file and ENV variables if set.
 func initConfig() {
-	/*if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".pf9ctl")
-	}*/
-
-	// Read in environment variables that match
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
 		zap.S().Errorf("Error occured while reading the config file: %s", viper.ConfigFileUsed())

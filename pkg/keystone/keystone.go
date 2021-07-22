@@ -16,7 +16,6 @@ type KeystoneAuth struct {
 	UserID    string
 	ProjectID string
 	Email     string
-
 }
 
 type Keystone interface {
